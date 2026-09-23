@@ -1,1 +1,1 @@
-.card details{display:none}.modal__details .facts{grid-template-columns:100px 1fr;margin-top:23px}.modal__details .story{font-size:13px}@media(max-width:560px){.modal__details .facts{grid-template-columns:83px 1fr}}
+.card details{display:none}.tabs--five{grid-template-columns:repeat(5,1fr)}.modal__details .facts{grid-template-columns:100px 1fr;margin-top:23px}.modal__details .story{font-size:13px}@media(max-width:560px){.tabs--five{grid-template-columns:repeat(2,1fr)}.modal__details .facts{grid-template-columns:83px 1fr}}
