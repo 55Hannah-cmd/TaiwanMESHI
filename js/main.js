@@ -81,6 +81,9 @@
   const count = document.querySelector('#count');
   const copy = document.querySelector('#category-copy');
   const tabs = document.querySelectorAll('.tab');
+  const modal = document.querySelector('#food-modal');
+  const modalContent = document.querySelector('#modal-content');
+  const foodBySlug = new Map(foods.map(food => [food.slug, food]));
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   function card(food) {
     const story = `${food.what}。${food.taste}。${food.scene}。日本でいうと${food.compare}に近いですが、${food.diff}。${food.tip}。${food.shareText}。`;
@@ -89,6 +92,7 @@
   function render(category) {
     const shown = foods.filter(food => food.cat === category);
     cards.innerHTML = shown.map(card).join('');
+    shown.forEach((food, index) => cards.children[index].insertAdjacentHTML('beforeend', `<button class="card__more" type="button" data-food-detail="${food.slug}" aria-haspopup="dialog">味と食べ方を詳しく見る</button>`));
     count.textContent = `${shown.length} dishes · ${categoryInfo[category][0]}`;
     copy.textContent = categoryInfo[category][1];
   }
@@ -97,5 +101,20 @@
     tab.classList.add('is-active'); tab.setAttribute('aria-selected', 'true'); render(tab.dataset.category);
     document.querySelector('.guide').scrollIntoView({behavior:'smooth', block:'start'});
   }));
+  const closeModal = () => { modal.hidden = true; modal.setAttribute('aria-hidden', 'true'); document.body.classList.remove('is-modal-open'); };
+  cards.addEventListener('click', event => {
+    const button = event.target.closest('[data-food-detail]');
+    if (!button) return;
+    const food = foodBySlug.get(button.dataset.foodDetail);
+    if (!food) return;
+    const detail = button.closest('.card').querySelector('.card__details').innerHTML;
+    modalContent.innerHTML = `<div class="modal__head"><img class="modal__image" src="./img/${food.slug}.png" alt="${esc(food.name)}の実写風料理写真"><div><h2 id="modal-title" class="modal__title">${esc(food.name)}</h2><p class="modal__reading">${esc(food.reading)}</p><p class="modal__lead">${esc(food.what)}</p></div></div><div class="modal__details">${detail}</div>`;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-modal-open');
+    modal.querySelector('[data-modal-close]').focus();
+  });
+  modal.addEventListener('click', event => { if (event.target.closest('[data-modal-close]')) closeModal(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
   render('meal');
 })();
